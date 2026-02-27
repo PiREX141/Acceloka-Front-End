@@ -1,5 +1,5 @@
-import Image from "next/image";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return <div>Hello World</div>;
+export default function RootPage() {
+  redirect("/home");
 }

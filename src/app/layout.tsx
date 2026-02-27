@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 const josefinSans = Josefin_Sans({
-  variable: "--font-josefin-sans",
+  variable: "--font-josefin",
   subsets: ["latin"],
 });
 
