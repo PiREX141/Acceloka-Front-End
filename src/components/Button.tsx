@@ -8,12 +8,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 const buttonVariants = cva("font-josefin transition focus:outline-none", {
   variants: {
     variant: {
-      navbar: "text-primary",
+      title: "text-primary",
+      navbar: "text-subPrimary",
       general: "text-secondary p-8 bg-foreground rounded-md",
       image: "",
     },
     fontSize: {
-      md: "text-base",
+      md: "text-2xl",
       lg: "text-3xl",
       title: "text-4xl",
     },
