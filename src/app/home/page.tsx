@@ -5,6 +5,7 @@ import Navbar from "@/src/components/Navbar";
 import Image from "next/image";
 import { motion } from "motion/react";
 import Footer from "@/src/components/Footer";
+import HomeTicketTile from "@/src/components/HomeTicketTile";
 
 export default function Home() {
   return (
@@ -17,59 +18,86 @@ export default function Home() {
     >
       <Navbar />
 
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1 }}
-        className="h-fit p-15 pr-0 grid grid-cols-12 items-start"
-      >
+      <div className="flex-1 flex flex-col">
         <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          whileInView={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1 }}
-          className="col-start-1 col-span-6 flex flex-col"
+          className="h-fit p-15 pr-0 grid grid-cols-12 items-start"
         >
-          <h1 className="text-5xl pb-2">Welcome to Acceloka</h1>
-          <h1 className="text-6xl leading-16 pb-2">
-            Your one stop destination for all kinds of tickets!
-          </h1>
-          <p className="text-2xl">
-            Acceloka prides itself with multiple ticket booking services such
-            as: transports, hotels, cinemas, and concerts. What are you waiting
-            for? Try out our services!
-          </p>
-
-          <Button
-            variant="general"
-            hoverBehavior="glow"
-            toPage="/tickets"
-            className="w-fit mt-6"
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="col-start-1 col-span-6 flex flex-col"
           >
-            View Tickets
-          </Button>
+            <h1 className="text-5xl pb-2">Welcome to Acceloka</h1>
+            <h1 className="text-6xl leading-16 pb-2">
+              Your one stop destination for all kinds of tickets!
+            </h1>
+            <p className="text-2xl">
+              Acceloka prides itself with multiple ticket booking services such
+              as: transports, hotels, cinemas, and concerts. What are you
+              waiting for? Try out our services!
+            </p>
+
+            <Button
+              variant="general"
+              hoverBehavior="glow"
+              toPage="/tickets"
+              className="w-fit mt-6"
+            >
+              View Tickets
+            </Button>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="col-start-7 col-span-6 justify-self-end"
+          >
+            <Image
+              src="/Transport.png"
+              alt="Transports Photo"
+              width={1030}
+              height={1000}
+            />
+          </motion.div>
         </motion.div>
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          whileInView={{ opacity: 1, x: 0 }}
+      </div>
+
+      <div className="pt-1.5 col-start-1 col-span-12 flex flex-col">
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1 }}
-          className="col-start-7 col-span-6 justify-self-end"
+          className="text-5xl self-center"
         >
-          <Image
-            src="/Transport.png"
-            alt="Transports Photo"
-            width={1030}
-            height={1000}
-          />
+          Booking Services
+        </motion.h1>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="flex flex-col gap-3 pb-40 px-15"
+        >
+          <div className="flex flex-row justify-evenly pt-7 px-6">
+            <HomeTicketTile ticketType="flight" toPage="/tickets" />
+            <HomeTicketTile ticketType="train" toPage="/tickets" />
+            <HomeTicketTile ticketType="ferry" toPage="/tickets" />
+          </div>
+          <div className="flex flex-row justify-evenly pt-5 px-6">
+            <HomeTicketTile ticketType="hotel" toPage="/tickets" />
+            <HomeTicketTile ticketType="cinema" toPage="/tickets" />
+            <HomeTicketTile ticketType="concert" toPage="/tickets" />
+          </div>
         </motion.div>
-
-        <motion.div className="pt-40">
-          <h1>Booking Services</h1>
-        </motion.div>
-      </motion.div>
-
+      </div>
       <Footer />
     </div>
   );

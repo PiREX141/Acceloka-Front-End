@@ -4,6 +4,7 @@ import React, { HTMLAttributes, ReactNode } from "react";
 // import { useNavigate } from "react-router-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { cva, type VariantProps } from "class-variance-authority";
+import { motion } from "motion/react";
 
 const buttonVariants = cva("font-josefin transition focus:outline-none", {
   variants: {
@@ -19,8 +20,8 @@ const buttonVariants = cva("font-josefin transition focus:outline-none", {
       title: "text-4xl",
     },
     hoverBehavior: {
-      bolded: "hover:font-bold",
-      glow: "transition-all duration-300 hover:shadow-[0_0_25px_rgba(37,99,235,0.7)]",
+      bolded: "transition-all duration-100 hover:font-bold",
+      glow: "transition-all duration-350 hover:shadow-[0_0_25px_rgba(37,99,235,0.7)]",
       standard: "hover:font-normal",
     },
   },
@@ -31,28 +32,14 @@ const buttonVariants = cva("font-josefin transition focus:outline-none", {
   },
 });
 
-const motionVariantMap = {
-  primary: {
-    whileHover: { scale: 1.05 },
-    whileTap: { scale: 0.95 },
-  },
-  secondary: {
-    whileHover: { rotate: 3, scale: 1.03 },
-    whileTap: { scale: 0.95 },
-  },
-  danger: {
-    whileHover: { x: [-2, 2, -2, 2, 0] }, // shake
-    whileTap: { scale: 0.9 },
-  },
-};
-
 type ButtonProps = {
   children: ReactNode;
   toPage?: string;
   activeBold?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 } & HTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof buttonVariants>;
+  VariantProps<typeof buttonVariants> &
+  React.ComponentProps<typeof motion.button>;
 
 const Button: React.FC<ButtonProps> = ({
   children,
@@ -76,15 +63,24 @@ const Button: React.FC<ButtonProps> = ({
       router.push(toPage);
     }
   };
+  const hoverAnimation =
+    variant !== "title"
+      ? {
+          scale: 1.1,
+          transition: { duration: 0.1 },
+        }
+      : undefined;
 
   return (
-    <button
+    <motion.button
+      whileHover={hoverAnimation}
+      transition={{ duration: 0.1 }}
       className={`${buttonVariants({ variant, fontSize, hoverBehavior })} ${isActive ? "font-bold" : ""} ${className ?? ""}`}
       onClick={handleClick}
       {...props}
     >
       {children}
-    </button>
+    </motion.button>
   );
 };
 

@@ -2,7 +2,11 @@ import React from "react";
 import Button from "./Button";
 import Image from "next/image";
 
-export default function Footer() {
+type footerProps = {
+  className?: string;
+};
+
+const Footer: React.FC<footerProps> = ({ className }) => {
   return (
     <div className="grid grid-cols-12 py-14 px-32 items-center bg-secondary">
       <div className="col-start-1 col-span-5 flex flex-col justify-start gap-3">
@@ -31,4 +35,6 @@ export default function Footer() {
       </div>
     </div>
   );
-}
+};
+
+export default Footer;
