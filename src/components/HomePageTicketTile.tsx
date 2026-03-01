@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 type ticketType = "flight" | "train" | "ferry" | "hotel" | "cinema" | "concert";
 
-type HomeTicketTileProps = {
+type HomePageTicketTileProps = {
   ticketType: ticketType;
   toPage?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -44,11 +44,11 @@ const tileContent = {
   },
 };
 
-const HomeTicketTile = ({
+const HomePageTicketTile = ({
   ticketType,
   toPage,
   onClick,
-}: HomeTicketTileProps) => {
+}: HomePageTicketTileProps) => {
   const content = tileContent[ticketType];
   const router = useRouter();
 
@@ -82,4 +82,4 @@ const HomeTicketTile = ({
   );
 };
 
-export default HomeTicketTile;
+export default HomePageTicketTile;

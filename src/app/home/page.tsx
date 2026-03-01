@@ -5,7 +5,7 @@ import Navbar from "@/src/components/Navbar";
 import Image from "next/image";
 import { motion } from "motion/react";
 import Footer from "@/src/components/Footer";
-import HomeTicketTile from "@/src/components/HomeTicketTile";
+import HomePageTicketTile from "@/src/components/HomePageTicketTile";
 
 export default function Home() {
   return (
@@ -87,14 +87,14 @@ export default function Home() {
           className="flex flex-col gap-3 pb-40 px-15"
         >
           <div className="flex flex-row justify-evenly pt-7 px-6">
-            <HomeTicketTile ticketType="flight" toPage="/tickets" />
-            <HomeTicketTile ticketType="train" toPage="/tickets" />
-            <HomeTicketTile ticketType="ferry" toPage="/tickets" />
+            <HomePageTicketTile ticketType="flight" toPage="/tickets" />
+            <HomePageTicketTile ticketType="train" toPage="/tickets" />
+            <HomePageTicketTile ticketType="ferry" toPage="/tickets" />
           </div>
           <div className="flex flex-row justify-evenly pt-5 px-6">
-            <HomeTicketTile ticketType="hotel" toPage="/tickets" />
-            <HomeTicketTile ticketType="cinema" toPage="/tickets" />
-            <HomeTicketTile ticketType="concert" toPage="/tickets" />
+            <HomePageTicketTile ticketType="hotel" toPage="/tickets" />
+            <HomePageTicketTile ticketType="cinema" toPage="/tickets" />
+            <HomePageTicketTile ticketType="concert" toPage="/tickets" />
           </div>
         </motion.div>
       </div>
