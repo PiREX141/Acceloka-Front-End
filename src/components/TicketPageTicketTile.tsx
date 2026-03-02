@@ -24,7 +24,7 @@ const iconMap: Record<TicketData["categoryName"], string> = {
   "Transportasi Laut": "/Ship Icon.svg",
   Hotel: "/Hotel Icon.svg",
   Cinema: "/Cinema Icon.svg",
-  Concert: "/Concert Icon.svg",
+  Konser: "/Concert Icon.svg",
 };
 
 const formatPrice = (price: number): string => {
@@ -76,9 +76,13 @@ const TicketPageTicketTile = ({
         {ticket.ticketCode}
       </h3>
 
-      <p className="text-2xl font-bold text-primary pb-2">
-        {formatPrice(ticket.price)}
-      </p>
+      <div className="h-16 flex items-center justify-center pb-2">
+        <p className="text-2xl font-bold text-primary text-center">
+          {ticket.ticketName}
+        </p>
+      </div>
+
+      <p className="text-xl text-primary pb-2">{formatPrice(ticket.price)}</p>
 
       <p className="text-base text-center text-subPrimary pb-3">
         {formatDate(ticket.eventDate)}
@@ -88,7 +92,12 @@ const TicketPageTicketTile = ({
         Available: {ticket.quota}
       </p>
 
-      <Button variant="general" onClick={handleBookClick}>
+      <Button
+        variant="general"
+        hoverBehavior="glow"
+        onClick={handleBookClick}
+        className="p-2 mt-auto"
+      >
         Book
       </Button>
     </motion.div>

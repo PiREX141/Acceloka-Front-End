@@ -6,6 +6,7 @@ import TicketPageTicketTile, {
   TicketData,
 } from "@/src/components/TicketPageTicketTile";
 import Footer from "@/src/components/Footer";
+import { motion } from "motion/react";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState<TicketData[]>([]);
@@ -49,7 +50,13 @@ export default function Tickets() {
   return (
     <div>
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1 }}
+        className="container mx-auto px-4 py-8"
+      >
         {loading && (
           <div className="flex justify-center items-center min-h-screen">
             <p className="text-xl text-subPrimary">Loading tickets...</p>
@@ -79,7 +86,7 @@ export default function Tickets() {
             <p className="text-xl text-subPrimary">No tickets available</p>
           </div>
         )}
-      </div>
+      </motion.div>
 
       <Footer />
     </div>
