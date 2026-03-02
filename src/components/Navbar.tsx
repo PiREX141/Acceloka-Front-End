@@ -57,12 +57,12 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
         </Button>
       </div>
 
-      <Button
+      {/* <Button
         variant="image"
         className="col-start-12 col-span-1 flex justify-end"
       >
         <Image src="/Profile Icon.svg" alt="Logo" width={50} height={50} />
-      </Button>
+      </Button> */}
     </nav>
   );
 };

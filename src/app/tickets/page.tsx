@@ -58,7 +58,7 @@ export default function Tickets() {
 
   const [searchBy, setSearchBy] = useState<
     "CategoryName" | "TicketCode" | "TicketName" | "MaxPrice"
-  >("CategoryName");
+  >("TicketName");
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
@@ -99,7 +99,6 @@ export default function Tickets() {
 
       alert("Booking Successful!");
 
-      // Clear cart after success
       setCart([]);
       setIsCartOpen(false);
 
@@ -288,6 +287,12 @@ export default function Tickets() {
           </Button>
         </div>
       </div>
+
+      {loading && <p className="px-15">Loading...</p>}
+
+      {!loading && debouncedSearchText && tickets.length === 0 && (
+        <p className="px-15">No tickets found.</p>
+      )}
 
       {/* Tickets Grid */}
       <motion.div

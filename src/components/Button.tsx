@@ -15,6 +15,7 @@ const buttonVariants = cva("font-josefin transition focus:outline-none", {
       image: "",
     },
     fontSize: {
+      sm: "text-lg",
       md: "text-2xl",
       lg: "text-3xl",
       title: "text-4xl",
