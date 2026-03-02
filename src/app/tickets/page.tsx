@@ -54,7 +54,7 @@ export default function Tickets() {
   const itemsPerPage = 8;
 
   const [searchText, setSearchText] = useState("");
-  const [debouncedSearchText, setDebouncedSearchText] = useState("");
+  const [appliedSearchText, setAppliedSearchText] = useState("");
 
   const [searchBy, setSearchBy] = useState<
     "CategoryName" | "TicketCode" | "TicketName" | "MaxPrice"
@@ -66,57 +66,10 @@ export default function Tickets() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleConfirmBooking = async () => {
-    if (cart.length === 0) return;
-
-    try {
-      setIsSubmitting(true);
-
-      const payload = {
-        tickets: cart.map((item) => ({
-          ticketCode: item.ticketCode,
-          quantity: item.quantity,
-        })),
-      };
-
-      const response = await fetch(
-        "https://localhost:7055/api/v1/book-ticket",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || "Booking failed");
-        return;
-      }
-
-      alert("Booking Successful!");
-
-      setCart([]);
-      setIsCartOpen(false);
-
-      console.log("Booking Response:", data);
-    } catch (error) {
-      console.error("Booking error:", error);
-      alert("Something went wrong");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleSearch = () => {
+    setAppliedSearchText(searchText.trim());
+    setCurrentPage(1);
   };
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchText(searchText);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchText]);
 
   const fetchTickets = async (page: number) => {
     try {
@@ -129,8 +82,8 @@ export default function Tickets() {
         OrderDirection: "ASC",
       });
 
-      if (debouncedSearchText) {
-        params.append(searchBy, debouncedSearchText);
+      if (appliedSearchText) {
+        params.append(searchBy, appliedSearchText);
       }
 
       if (dateRange?.from) {
@@ -159,13 +112,7 @@ export default function Tickets() {
 
   useEffect(() => {
     fetchTickets(currentPage);
-  }, [currentPage, debouncedSearchText, searchBy, dateRange]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearchText, searchBy, dateRange]);
-
-  const totalPages = Math.ceil(totalTickets / itemsPerPage);
+  }, [currentPage, appliedSearchText, searchBy, dateRange]);
 
   const handleBookClick = (ticket: TicketData) => {
     setCart((prevCart) => {
@@ -195,6 +142,47 @@ export default function Tickets() {
     setIsCartOpen(true);
   };
 
+  const handleConfirmBooking = async () => {
+    if (cart.length === 0) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        tickets: cart.map((item) => ({
+          ticketCode: item.ticketCode,
+          quantity: item.quantity,
+        })),
+      };
+
+      const response = await fetch(
+        "https://localhost:7055/api/v1/book-ticket",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Booking failed");
+        return;
+      }
+
+      alert("Booking Successful!");
+      setCart([]);
+      setIsCartOpen(false);
+    } catch (error) {
+      alert("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const totalPages = Math.ceil(totalTickets / itemsPerPage);
+
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
@@ -204,17 +192,20 @@ export default function Tickets() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      {/* Header */}
       <div className="px-15 pt-10 pb-3 flex flex-col gap-3">
         <h1 className="text-3xl">Find your tickets!</h1>
 
         <div className="flex items-center gap-3 w-full">
           <div className="flex items-center w-full max-w-md rounded-md border bg-secondary px-3">
             <Image src="/Search Icon.svg" alt="Search" width={18} height={18} />
+
             <Input
               placeholder={`Search by ${searchBy}`}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
               className="border-0 bg-transparent focus-visible:ring-0"
             />
 
@@ -267,7 +258,10 @@ export default function Tickets() {
               <Calendar
                 mode="range"
                 selected={dateRange}
-                onSelect={setDateRange}
+                onSelect={(range) => {
+                  setDateRange(range);
+                  setCurrentPage(1);
+                }}
                 numberOfMonths={2}
               />
             </PopoverContent>
@@ -289,12 +283,10 @@ export default function Tickets() {
       </div>
 
       {loading && <p className="px-15">Loading...</p>}
-
-      {!loading && debouncedSearchText && tickets.length === 0 && (
+      {!loading && tickets.length === 0 && (
         <p className="px-15">No tickets found.</p>
       )}
 
-      {/* Tickets Grid */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -312,6 +304,7 @@ export default function Tickets() {
                 />
               ))}
             </div>
+
             {totalPages > 1 && (
               <div className="mt-8">
                 <Pagination>

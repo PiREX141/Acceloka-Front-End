@@ -1,92 +1,91 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-interface Ticket {
+type Ticket = {
   ticketCode: string;
   ticketName: string;
   eventDate: string;
-}
+};
 
-interface BookedTicketGroup {
+type BookedTicketGroup = {
   qtyPerCategory: number;
   categoryName: string;
   tickets: Ticket[];
-}
+};
 
 const GetBookedTicketView = () => {
   const [searchText, setSearchText] = useState("");
-  const [debouncedSearchText, setDebouncedSearchText] = useState("");
   const [data, setData] = useState<BookedTicketGroup[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Debounce
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchText(searchText);
-    }, 500);
+  const fetchData = async () => {
+    if (!searchText.trim() || loading) return;
 
-    return () => clearTimeout(handler);
-  }, [searchText]);
+    setHasSearched(true);
 
-  // Fetch API when debounced value changes
-  useEffect(() => {
-    if (!debouncedSearchText) {
-      setData([]);
-      return;
-    }
+    try {
+      setLoading(true);
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+      const res = await fetch(
+        `https://localhost:7055/api/v1/get-booked-ticket/${searchText.trim()}`,
+      );
 
-        const res = await fetch(
-          `https://localhost:7055/api/v1/get-booked-ticket/${debouncedSearchText}`,
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch");
-        }
-
-        const result = await res.json();
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching booked tickets:", error);
-        setData([]);
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        throw new Error("Failed to fetch");
       }
-    };
 
-    fetchData();
-  }, [debouncedSearchText]);
+      const result = await res.json();
+      setData(result);
+    } catch (error) {
+      console.error("Error fetching booked tickets:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Check your Tickets!</h1>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl">Check your tickets!</h1>
 
-      {/* Search Bar */}
-      <div className="flex items-center w-full max-w-md rounded-md border bg-secondary px-3">
-        <Image src="/Search Icon.svg" alt="Search" width={18} height={18} />
-        <Input
-          placeholder="Search for BookedTicketId"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          className="border-0 bg-transparent focus-visible:ring-0"
-        />
+        <div className="flex items-center w-full max-w-md gap-2">
+          <div className="flex items-center w-full rounded-md border bg-secondary px-3">
+            <Image src="/Search Icon.svg" alt="Search" width={18} height={18} />
+
+            <Input
+              placeholder="Search for BookedTicketId"
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setHasSearched(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  fetchData();
+                }
+              }}
+              className="border-0 bg-transparent focus-visible:ring-0"
+            />
+          </div>
+
+          <Button
+            onClick={fetchData}
+            disabled={loading || !searchText.trim()}
+            className="bg-subPrimary"
+          >
+            {loading ? "Searching..." : "Search"}
+          </Button>
+        </div>
       </div>
 
-      {/* Loading */}
-      {loading && <p>Loading...</p>}
+      {!loading && hasSearched && data.length === 0 && <p>No tickets found.</p>}
 
-      {/* No Data */}
-      {!loading && debouncedSearchText && data.length === 0 && (
-        <p>No tickets found.</p>
-      )}
-
-      {/* Display Data */}
       <div className="flex flex-col gap-6">
         {data.map((group, index) => (
           <div key={index} className="border rounded-lg p-4 shadow-sm bg-white">

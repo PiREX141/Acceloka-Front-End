@@ -5,6 +5,8 @@ import Navbar from "@/src/components/Navbar";
 import Button from "@/src/components/Button";
 import { useState } from "react";
 import GetBookedTicketView from "@/src/components/GetBookedTicketView";
+import RevokeTicketView from "@/src/components/RevokeTicketView";
+import EditBookingView from "@/src/components/EditBookingView";
 
 export default function Bookings() {
   const [activeView, setActiveView] = useState<
@@ -34,18 +36,18 @@ export default function Bookings() {
           <Button
             fontSize="sm"
             hoverBehavior="glow"
-            onClick={() => setActiveView("edit")}
-            className="w-fit"
-          >
-            Edit Booking
-          </Button>
-          <Button
-            fontSize="sm"
-            hoverBehavior="glow"
             onClick={() => setActiveView("revoke")}
             className="w-fit"
           >
             Revoke Booking
+          </Button>
+          <Button
+            fontSize="sm"
+            hoverBehavior="glow"
+            onClick={() => setActiveView("edit")}
+            className="w-fit"
+          >
+            Edit Booking
           </Button>
         </div>
       </div>
@@ -53,8 +55,8 @@ export default function Bookings() {
       <div className="px-15 pb-32">
         {activeView === null && <GetBookedTicketView />}
         {activeView === "check" && <GetBookedTicketView />}
-        {/* {activeView === "edit" && <EditBooking />}
-        {activeView === "revoke" && <RevokeTicket />} */}
+        {activeView === "revoke" && <RevokeTicketView />}
+        {activeView === "edit" && <EditBookingView />}
       </div>
       <Footer />
     </div>
