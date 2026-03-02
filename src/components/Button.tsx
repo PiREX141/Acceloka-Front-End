@@ -11,7 +11,7 @@ const buttonVariants = cva("font-josefin transition focus:outline-none", {
     variant: {
       title: "text-primary",
       navbar: "text-subPrimary",
-      general: "text-secondary p-5 bg-subPrimary rounded-2xl",
+      general: "text-secondary p-4 bg-subPrimary rounded-2xl",
       image: "",
     },
     fontSize: {
