@@ -87,14 +87,23 @@ export default function Home() {
           className="flex flex-col gap-3 pb-40 px-15"
         >
           <div className="flex flex-row justify-evenly pt-7 px-6">
-            <HomePageTicketTile ticketType="flight" toPage="/tickets" />
-            <HomePageTicketTile ticketType="train" toPage="/tickets" />
-            <HomePageTicketTile ticketType="ferry" toPage="/tickets" />
+            <HomePageTicketTile
+              ticketType="Transportasi Udara"
+              toPage="/tickets"
+            />
+            <HomePageTicketTile
+              ticketType="Transportasi Darat"
+              toPage="/tickets"
+            />
+            <HomePageTicketTile
+              ticketType="Transportasi Laut"
+              toPage="/tickets"
+            />
           </div>
           <div className="flex flex-row justify-evenly pt-5 px-6">
-            <HomePageTicketTile ticketType="hotel" toPage="/tickets" />
-            <HomePageTicketTile ticketType="cinema" toPage="/tickets" />
-            <HomePageTicketTile ticketType="concert" toPage="/tickets" />
+            <HomePageTicketTile ticketType="Hotel" toPage="/tickets" />
+            <HomePageTicketTile ticketType="Cinema" toPage="/tickets" />
+            <HomePageTicketTile ticketType="Concert" toPage="/tickets" />
           </div>
         </motion.div>
       </div>

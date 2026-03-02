@@ -5,7 +5,13 @@ import { motion } from "motion/react";
 import { HTMLAttributes } from "react";
 import { useRouter } from "next/navigation";
 
-type ticketType = "flight" | "train" | "ferry" | "hotel" | "cinema" | "concert";
+type ticketType =
+  | "Transportasi Udara"
+  | "Transportasi Darat"
+  | "Transportasi Laut"
+  | "Hotel"
+  | "Cinema"
+  | "Concert";
 
 type HomePageTicketTileProps = {
   ticketType: ticketType;
@@ -14,30 +20,30 @@ type HomePageTicketTileProps = {
 } & HTMLAttributes<HTMLButtonElement>;
 
 const tileContent = {
-  flight: {
+  "Transportasi Udara": {
     image: "/Plane Icon.svg",
     description: "Need a quick flight? Book a flight with us now!",
   },
-  train: {
+  "Transportasi Darat": {
     image: "/Train Icon.svg",
     description:
       "Need a quick train trip somewhere? Book a train ride with us now!",
   },
-  ferry: {
+  "Transportasi Laut": {
     image: "/Ship Icon.svg",
     description: "Need a quick ferry ride? Book a ferry ride with us now!",
   },
-  hotel: {
+  Hotel: {
     image: "/Hotel Icon.svg",
     description:
       "Need a place to stay during your travels? Book a hotel with us now!",
   },
-  cinema: {
+  Cinema: {
     image: "/Cinema Icon.svg",
     description:
       "Your favorite movie is playing at the cinema? Book a ticket with us now!",
   },
-  concert: {
+  Concert: {
     image: "/Concert Icon.svg",
     description:
       "Your favorite singer is playing soon? Book a concert ticket with us now!",
