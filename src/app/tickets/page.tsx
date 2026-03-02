@@ -64,6 +64,53 @@ export default function Tickets() {
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleConfirmBooking = async () => {
+    if (cart.length === 0) return;
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        tickets: cart.map((item) => ({
+          ticketCode: item.ticketCode,
+          quantity: item.quantity,
+        })),
+      };
+
+      const response = await fetch(
+        "https://localhost:7055/api/v1/book-ticket",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Booking failed");
+        return;
+      }
+
+      alert("Booking Successful!");
+
+      // Clear cart after success
+      setCart([]);
+      setIsCartOpen(false);
+
+      console.log("Booking Response:", data);
+    } catch (error) {
+      console.error("Booking error:", error);
+      alert("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -249,16 +296,46 @@ export default function Tickets() {
         transition={{ duration: 0.6 }}
         className="container mx-auto px-4 py-8"
       >
-        {!loading && tickets.length > 0 && (
-          <div className="grid grid-cols-4 gap-6 justify-items-center">
-            {tickets.map((ticket) => (
-              <TicketPageTicketTile
-                key={ticket.ticketCode}
-                ticket={ticket}
-                onClick={handleBookClick}
-              />
-            ))}
-          </div>
+        {!loading && !error && tickets.length > 0 && (
+          <>
+            <div className="grid grid-cols-4 gap-6 justify-items-center">
+              {tickets.map((ticket) => (
+                <TicketPageTicketTile
+                  key={ticket.ticketCode}
+                  ticket={ticket}
+                  onClick={handleBookClick}
+                />
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-8">
+                <Pagination>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  />
+
+                  <PaginationContent>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <PaginationItem key={i}>
+                        <PaginationLink
+                          isActive={currentPage === i + 1}
+                          onClick={() => setCurrentPage(i + 1)}
+                        >
+                          {i + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                  </PaginationContent>
+
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(p + 1, totalPages))
+                    }
+                  />
+                </Pagination>
+              </div>
+            )}
+          </>
         )}
       </motion.div>
 
@@ -293,6 +370,8 @@ export default function Tickets() {
             prev.filter((item) => item.ticketCode !== ticketCode),
           )
         }
+        onConfirm={handleConfirmBooking}
+        isSubmitting={isSubmitting}
       />
 
       <Footer />
