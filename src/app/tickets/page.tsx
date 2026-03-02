@@ -15,6 +15,34 @@ import {
   PaginationNext,
   PaginationContent,
 } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import CartModal from "@/src/components/CartModal";
+
+type CartItem = {
+  ticketCode: string;
+  ticketName: string;
+  price: number;
+  quantity: number;
+};
 
 export default function Tickets() {
   const [tickets, setTickets] = useState<TicketData[]>([]);
@@ -25,25 +53,59 @@ export default function Tickets() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  const [searchText, setSearchText] = useState("");
+  const [debouncedSearchText, setDebouncedSearchText] = useState("");
+
+  const [searchBy, setSearchBy] = useState<
+    "CategoryName" | "TicketCode" | "TicketName" | "MaxPrice"
+  >("CategoryName");
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchText(searchText);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
   const fetchTickets = async (page: number) => {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        `https://localhost:7055/api/v1/get-available-ticket?PageNumber=${page}&PageSize=${itemsPerPage}&OrderBy=TicketCode&OrderDirection=ASC`,
-      );
+      const params = new URLSearchParams({
+        PageNumber: page.toString(),
+        PageSize: itemsPerPage.toString(),
+        OrderBy: "TicketCode",
+        OrderDirection: "ASC",
+      });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch tickets");
+      if (debouncedSearchText) {
+        params.append(searchBy, debouncedSearchText);
       }
 
-      const data = await response.json();
+      if (dateRange?.from) {
+        params.append("EventDateFrom", format(dateRange.from, "yyyy-MM-dd"));
+      }
 
+      if (dateRange?.to) {
+        params.append("EventDateTo", format(dateRange.to, "yyyy-MM-dd"));
+      }
+
+      const response = await fetch(
+        `https://localhost:7055/api/v1/get-available-ticket?${params.toString()}`,
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch tickets");
+
+      const data = await response.json();
       setTickets(data.tickets);
       setTotalTickets(data.totalTickets);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Error fetching tickets:", err);
     } finally {
       setLoading(false);
     }
@@ -51,86 +113,187 @@ export default function Tickets() {
 
   useEffect(() => {
     fetchTickets(currentPage);
-  }, [currentPage]);
+  }, [currentPage, debouncedSearchText, searchBy, dateRange]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchText, searchBy, dateRange]);
 
   const totalPages = Math.ceil(totalTickets / itemsPerPage);
 
   const handleBookClick = (ticket: TicketData) => {
-    console.log("Booking ticket:", ticket);
+    setCart((prevCart) => {
+      const existingItem = prevCart.find(
+        (item) => item.ticketCode === ticket.ticketCode,
+      );
+
+      if (existingItem) {
+        return prevCart.map((item) =>
+          item.ticketCode === ticket.ticketCode
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
+      }
+
+      return [
+        ...prevCart,
+        {
+          ticketCode: ticket.ticketCode,
+          ticketName: ticket.ticketName,
+          price: ticket.price,
+          quantity: 1,
+        },
+      ];
+    });
+
+    setIsCartOpen(true);
   };
 
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
 
+      {/* Header */}
+      <div className="px-15 pt-10 pb-3 flex flex-col gap-3">
+        <h1 className="text-3xl">Find your tickets!</h1>
+
+        <div className="flex items-center gap-3 w-full">
+          <div className="flex items-center w-full max-w-md rounded-md border bg-secondary px-3">
+            <Image src="/Search Icon.svg" alt="Search" width={18} height={18} />
+            <Input
+              placeholder={`Search by ${searchBy}`}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="border-0 bg-transparent focus-visible:ring-0"
+            />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Image
+                    src="/Filter Icon.svg"
+                    alt="Filter"
+                    width={18}
+                    height={18}
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Search By</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => setSearchBy("CategoryName")}>
+                    Category Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSearchBy("TicketCode")}>
+                    Ticket Code
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSearchBy("TicketName")}>
+                    Ticket Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSearchBy("MaxPrice")}>
+                    Max Price
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="w-fit p-0">
+                <Image
+                  src="/Calendar Icon.svg"
+                  alt="Calendar Icon"
+                  width={40}
+                  height={40}
+                />
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={setDateRange}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <Button
+            variant="ghost"
+            className="ml-auto"
+            onClick={() => setIsCartOpen(true)}
+          >
+            <Image
+              src="/Shopping Cart Icon.svg"
+              alt="Cart"
+              width={40}
+              height={40}
+            />
+          </Button>
+        </div>
+      </div>
+
+      {/* Tickets Grid */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 0.6 }}
         className="container mx-auto px-4 py-8"
       >
-        {loading && (
-          <div className="flex justify-center items-center min-h-screen">
-            <p className="text-xl text-subPrimary">Loading tickets...</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="flex justify-center items-center min-h-screen">
-            <p className="text-xl text-red-500">Error: {error}</p>
-          </div>
-        )}
-
-        {!loading && !error && tickets.length > 0 && (
-          <>
-            <div className="grid grid-cols-4 gap-6 justify-items-center">
-              {tickets.map((ticket) => (
-                <TicketPageTicketTile
-                  key={ticket.ticketCode}
-                  ticket={ticket}
-                  onClick={handleBookClick}
-                />
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="mt-8">
-                <Pagination>
-                  <PaginationPrevious
-                    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                  />
-
-                  <PaginationContent>
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <PaginationItem key={i}>
-                        <PaginationLink
-                          isActive={currentPage === i + 1}
-                          onClick={() => setCurrentPage(i + 1)}
-                        >
-                          {i + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                  </PaginationContent>
-
-                  <PaginationNext
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(p + 1, totalPages))
-                    }
-                  />
-                </Pagination>
-              </div>
-            )}
-          </>
-        )}
-
-        {!loading && !error && tickets.length === 0 && (
-          <div className="flex justify-center items-center min-h-screen">
-            <p className="text-xl text-subPrimary">No tickets available</p>
+        {!loading && tickets.length > 0 && (
+          <div className="grid grid-cols-4 gap-6 justify-items-center">
+            {tickets.map((ticket) => (
+              <TicketPageTicketTile
+                key={ticket.ticketCode}
+                ticket={ticket}
+                onClick={handleBookClick}
+              />
+            ))}
           </div>
         )}
       </motion.div>
+
+      <CartModal
+        cart={cart}
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        totalPrice={totalPrice}
+        onIncrease={(ticketCode) =>
+          setCart((prev) =>
+            prev.map((item) =>
+              item.ticketCode === ticketCode
+                ? { ...item, quantity: item.quantity + 1 }
+                : item,
+            ),
+          )
+        }
+        onDecrease={(ticketCode) =>
+          setCart((prev) =>
+            prev.map((item) =>
+              item.ticketCode === ticketCode
+                ? {
+                    ...item,
+                    quantity: item.quantity > 1 ? item.quantity - 1 : 1,
+                  }
+                : item,
+            ),
+          )
+        }
+        onRemove={(ticketCode) =>
+          setCart((prev) =>
+            prev.filter((item) => item.ticketCode !== ticketCode),
+          )
+        }
+      />
 
       <Footer />
     </div>

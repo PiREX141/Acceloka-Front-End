@@ -64,7 +64,7 @@ const Button: React.FC<ButtonProps> = ({
     }
   };
   const hoverAnimation =
-    variant !== "title"
+    variant !== "title" && variant !== "image"
       ? {
           scale: 1.1,
           transition: { duration: 0.1 },
