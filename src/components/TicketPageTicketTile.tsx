@@ -13,7 +13,7 @@ export type TicketData = {
   quota: number;
 };
 
-type Props = {
+type ticketProps = {
   ticket: TicketData;
   onClick?: (ticket: TicketData) => void;
 };
@@ -39,7 +39,7 @@ const formatDate = (dateStr: string) => {
   return d.toLocaleString("id-ID");
 };
 
-export default function TicketPageTicketTile({ ticket, onClick }: Props) {
+const TicketPageTicketTile = ({ ticket, onClick }: ticketProps) => {
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
@@ -81,4 +81,6 @@ export default function TicketPageTicketTile({ ticket, onClick }: Props) {
       </Button>
     </motion.div>
   );
-}
+};
+
+export default TicketPageTicketTile;
