@@ -175,7 +175,7 @@ export default function Tickets() {
       <Navbar />
 
       <div className="px-15 pt-10 pb-3 flex flex-col gap-3">
-        <h1 className="text-3xl">Find your tickets!</h1>
+        <h1 className="text-3xl font-semibold">Find your tickets!</h1>
 
         <div className="flex items-center gap-3 w-full">
           <div className="flex items-center w-full max-w-md rounded-md border bg-secondary px-3">

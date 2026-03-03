@@ -4,24 +4,13 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-
-type Ticket = {
-  ticketCode: string;
-  ticketName: string;
-  eventDate?: string;
-};
-
-type BookedTicketGroup = {
-  categoryName: string;
-  tickets: Ticket[];
-};
-
-type EditResponse = {
-  ticketCode: string;
-  ticketName: string;
-  quantity: number;
-  categoryName: string;
-};
+import {
+  Ticket,
+  BookedTicketGroup,
+  EditResponse,
+  getBookedTickets,
+  editBookedTickets,
+} from "@/lib/api/apiServices";
 
 const EditBookingView = () => {
   const [searchText, setSearchText] = useState("");
@@ -40,20 +29,16 @@ const EditBookingView = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        `https://localhost:7055/api/v1/get-booked-ticket/${searchText.trim()}`,
-      );
+      const result = await getBookedTickets(searchText.trim());
 
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const result = await res.json();
       setData(result);
       setUpdatedData([]);
 
       const initialQuantities: Record<string, number> = {};
-      result.forEach((group: any) => {
-        group.tickets.forEach((ticket: any) => {
-          initialQuantities[ticket.ticketCode] = group.qtyPerCategory;
+
+      result.forEach((group) => {
+        group.tickets.forEach((ticket) => {
+          initialQuantities[ticket.ticketCode] = ticket.quantity;
         });
       });
 
@@ -88,18 +73,8 @@ const EditBookingView = () => {
         })),
       };
 
-      const res = await fetch(
-        `https://localhost:7055/api/v1/edit-booked-ticket/${searchText.trim()}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
+      const result = await editBookedTickets(searchText.trim(), payload);
 
-      if (!res.ok) throw new Error("Failed to update tickets");
-
-      const result: EditResponse[] = await res.json();
       setUpdatedData(result);
 
       alert("Tickets successfully updated!");
@@ -114,7 +89,7 @@ const EditBookingView = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl">Edit your tickets!</h1>
+        <h1 className="text-2xl">Edit your Bookings!</h1>
 
         <div className="flex items-center w-full max-w-md gap-2">
           <div className="flex items-center w-full rounded-md border bg-secondary px-3">

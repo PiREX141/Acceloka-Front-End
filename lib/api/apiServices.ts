@@ -25,6 +25,7 @@ export type Ticket = {
   ticketCode: string;
   ticketName: string;
   eventDate: string;
+  quantity: number;
 };
 
 export type BookedTicketGroup = {

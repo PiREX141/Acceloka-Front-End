@@ -6,18 +6,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { BookedTicketGroup, getBookedTickets } from "@/lib/api/apiServices";
 
-// type Ticket = {
-//   ticketCode: string;
-//   ticketName: string;
-//   eventDate: string;
-// };
-
-// type BookedTicketGroup = {
-//   qtyPerCategory: number;
-//   categoryName: string;
-//   tickets: Ticket[];
-// };
-
 const GetBookedTicketView = () => {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState<BookedTicketGroup[]>([]);
@@ -45,7 +33,7 @@ const GetBookedTicketView = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl">Check your tickets!</h1>
+        <h1 className="text-2xl">Check your Bookings!</h1>
 
         <div className="flex items-center w-full max-w-md gap-2">
           <div className="flex items-center w-full rounded-md border bg-secondary px-3">

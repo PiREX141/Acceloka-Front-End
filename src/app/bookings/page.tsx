@@ -18,7 +18,7 @@ export default function Bookings() {
       <Navbar />
 
       <div className="px-15 pt-10 pb-10 flex flex-col gap-2">
-        <h1 className="text-3xl">What would you like to do?</h1>
+        <h1 className="text-3xl font-semibold">What would you like to do?</h1>
 
         <p className="pt-2.5 text-lg">
           Please select an action to manage your bookings.
