@@ -33,7 +33,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import CartModal from "@/src/components/CartModal";
 import { getAvailableTickets, bookTicket } from "@/lib/api/apiServices";
@@ -61,7 +60,8 @@ export default function Tickets() {
     "CategoryName" | "TicketCode" | "TicketName" | "MaxPrice"
   >("TicketName");
 
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [dateFrom, setDateFrom] = useState<Date | undefined>();
+  const [dateTo, setDateTo] = useState<Date | undefined>();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -87,14 +87,19 @@ export default function Tickets() {
         params.append(searchBy, appliedSearchText);
       }
 
-      if (dateRange?.from) {
-        params.append("EventDateFrom", format(dateRange.from, "yyyy-MM-dd"));
+      if (dateFrom?.toString()) {
+        params.append(
+          "EventDateFrom",
+          dateFrom ? format(dateFrom, "yyyy-MM-dd") : "",
+        );
       }
 
-      if (dateRange?.to) {
-        params.append("EventDateTo", format(dateRange.to, "yyyy-MM-dd"));
+      if (dateTo?.toString()) {
+        params.append(
+          "EventDateTo",
+          dateTo ? format(dateTo, "yyyy-MM-dd") : "",
+        );
       }
-
       const data = await getAvailableTickets(params.toString());
 
       setTickets(data.tickets);
@@ -108,7 +113,7 @@ export default function Tickets() {
 
   useEffect(() => {
     fetchTickets(currentPage);
-  }, [currentPage, appliedSearchText, searchBy, dateRange]);
+  }, [currentPage, appliedSearchText, searchBy, dateFrom, dateTo]);
 
   const handleBookClick = (ticket: TicketData) => {
     setCart((prevCart) => {
@@ -237,15 +242,24 @@ export default function Tickets() {
             </PopoverTrigger>
 
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="range"
-                selected={dateRange}
-                onSelect={(range) => {
-                  setDateRange(range);
-                  setCurrentPage(1);
-                }}
-                numberOfMonths={2}
-              />
+              <div className="flex flex-row gap-1">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={setDateFrom}
+                  className="rounded-lg border"
+                  captionLayout="dropdown"
+                  endMonth={new Date(2100, 11, 31)}
+                />
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={setDateTo}
+                  className="rounded-lg border"
+                  captionLayout="dropdown"
+                  endMonth={new Date(2100, 11, 31)}
+                />
+              </div>
             </PopoverContent>
           </Popover>
 
