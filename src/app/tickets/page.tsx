@@ -36,6 +36,7 @@ import {
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import CartModal from "@/src/components/CartModal";
+import { getAvailableTickets, bookTicket } from "@/lib/api/apiServices";
 
 type CartItem = {
   ticketCode: string;
@@ -94,17 +95,12 @@ export default function Tickets() {
         params.append("EventDateTo", format(dateRange.to, "yyyy-MM-dd"));
       }
 
-      const response = await fetch(
-        `https://localhost:7055/api/v1/get-available-ticket?${params.toString()}`,
-      );
+      const data = await getAvailableTickets(params.toString());
 
-      if (!response.ok) throw new Error("Failed to fetch tickets");
-
-      const data = await response.json();
       setTickets(data.tickets);
       setTotalTickets(data.totalTickets);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Error occurred");
     } finally {
       setLoading(false);
     }
@@ -155,27 +151,13 @@ export default function Tickets() {
         })),
       };
 
-      const response = await fetch(
-        "https://localhost:7055/api/v1/book-ticket",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || "Booking failed");
-        return;
-      }
+      await bookTicket(payload);
 
       alert("Booking Successful!");
       setCart([]);
       setIsCartOpen(false);
     } catch (error) {
-      alert("Something went wrong");
+      alert("Booking failed");
     } finally {
       setIsSubmitting(false);
     }

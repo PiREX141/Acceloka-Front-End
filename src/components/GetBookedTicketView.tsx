@@ -4,18 +4,19 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { BookedTicketGroup, getBookedTickets } from "@/lib/api/apiServices";
 
-type Ticket = {
-  ticketCode: string;
-  ticketName: string;
-  eventDate: string;
-};
+// type Ticket = {
+//   ticketCode: string;
+//   ticketName: string;
+//   eventDate: string;
+// };
 
-type BookedTicketGroup = {
-  qtyPerCategory: number;
-  categoryName: string;
-  tickets: Ticket[];
-};
+// type BookedTicketGroup = {
+//   qtyPerCategory: number;
+//   categoryName: string;
+//   tickets: Ticket[];
+// };
 
 const GetBookedTicketView = () => {
   const [searchText, setSearchText] = useState("");
@@ -31,18 +32,10 @@ const GetBookedTicketView = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        `https://localhost:7055/api/v1/get-booked-ticket/${searchText.trim()}`,
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch");
-      }
-
-      const result = await res.json();
+      const result = await getBookedTickets(searchText.trim());
       setData(result);
     } catch (error) {
-      console.error("Error fetching booked tickets:", error);
+      console.error(error);
       setData([]);
     } finally {
       setLoading(false);

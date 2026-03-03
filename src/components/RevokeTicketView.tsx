@@ -4,13 +4,14 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { revokeTicket, UpdatedTicket } from "@/lib/api/apiServices";
 
-type UpdatedTicket = {
-  ticketCode: string;
-  ticketName: string;
-  categoryName: string;
-  quantity: number;
-};
+// type UpdatedTicket = {
+//   ticketCode: string;
+//   ticketName: string;
+//   categoryName: string;
+//   quantity: number;
+// };
 
 const RevokeTicketView = () => {
   const [bookedTicketId, setBookedTicketId] = useState<number | "">("");
@@ -33,20 +34,11 @@ const RevokeTicketView = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        `https://localhost:7055/api/v1/revoke-ticket/${bookedTicketId}/${encodeURIComponent(
-          ticketCode,
-        )}/${qty}`,
-        {
-          method: "DELETE",
-        },
+      const data = await revokeTicket(
+        bookedTicketId as number,
+        ticketCode,
+        qty as number,
       );
-
-      if (!res.ok) {
-        throw new Error("Failed to revoke ticket");
-      }
-
-      const data: UpdatedTicket = await res.json();
 
       setUpdatedTicket(data);
       setShowConfirm(false);
@@ -55,7 +47,7 @@ const RevokeTicketView = () => {
       setTicketCode("");
       setQty("");
     } catch (error) {
-      console.error("Error deleting ticket:", error);
+      console.error(error);
       alert("Something went wrong.");
     } finally {
       setLoading(false);
